@@ -31,14 +31,14 @@
 7. Run **commit_bug_mapping.py** and **fault_inducing.py** to identify bug-inducing commits.
 8. Run **analyse_genealogies.py** to perform Fisher's exact test for RQ1 and RQ2.
 9. Run **independant_variables.py** to extract explanatory variables for RQ3.
-10. Build GLM models with the R script in the **statistics/modelling** folder.
+10. Build __GLM__ models with the R script in the **statistics/modelling** folder.
 
 ###Data source
 - Source code repositories:
-  - ArgoUML
-  - Ant
-  - JEdit
-  - Maven
+  - ArgoUML: http://argouml-stats.stage.tigris.org/documentation/defaulthtml/cookbook/ch02s05.html
+  - Ant: git://git.apache.org/ant.git
+  - JEdit: https://sourceforge.net/p/jedit/svn/HEAD/tree/
+  - Maven: git://git.apache.org/maven.git
 - Bug tracking systems:
   - ArgoUML
   - Ant
