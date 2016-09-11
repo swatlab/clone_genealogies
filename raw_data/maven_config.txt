@@ -1,0 +1,5 @@
+tracker=jira
+pattern=(MNG\-[0-9]+)
+link=https://issues.apache.org/jira/si/jira.issueviews:issue-xml/%s/%s.xml
+creation_flag=created
+error_flag=error-page error404

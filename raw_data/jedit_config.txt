@@ -1,0 +1,5 @@
+tracker=sourceforge
+pattern=(?:bug|bugs|pb|fix for|fix)\s*\#\s*([0-9]+)
+link=https://sourceforge.net/p/jedit/bugs/search/?q=%s
+creation_flag=
+error_flag=
