@@ -92,20 +92,8 @@ def combineRenamedPair(raw_genealogy_dict, rename_dict):
             for renamed_paths in rename_dict[end_commit]:
                 if paths == renamed_paths:
                     print 'renamed!'
-                    # no renamed pair is found
                     break
     return
-
-# Extract commit sequence
-def loadCommitSequence(project):
-    commit_seq_dict = dict()
-    i = 0
-    with open('../raw_data/%s_commit_sequence.txt' %project, 'r') as f:
-        for line in f.read().split('\n'):
-            if len(line):
-                commit_seq_dict[line] = i
-                i += 1
-    return commit_seq_dict
 
 def loadFaultInducingCommits(project):
     fault_inducing_dict = dict()
@@ -176,9 +164,8 @@ if __name__ == '__main__':
         project = sys.argv[1]
         tool = sys.argv[2]
         raw_genealogy_dict, end_commit_set = raw_genealogies(project, tool)
-#        rename_dict = renamedFiles(end_commit_set)
-#        combineRenamedPair(raw_genealogy_dict, rename_dict)
-        #commit_seq_dict = loadCommitSequence(project)
+        rename_dict = renamedFiles(end_commit_set)
+        combineRenamedPair(raw_genealogy_dict, rename_dict)
         commit_date_dict = loadCommitDate('../raw_data/%s_logs.txt' %project)
         fault_inducing_dict = loadFaultInducingCommits(project)
         genealogyFeatures(raw_genealogy_dict, fault_inducing_dict, commit_date_dict)
