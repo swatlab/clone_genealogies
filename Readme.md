@@ -36,14 +36,14 @@
 ###Data source
 - Source code repositories:
   - ArgoUML: http://argouml-stats.stage.tigris.org/documentation/defaulthtml/cookbook/ch02s05.html
-  - Ant: git://git.apache.org/ant.git
+  - Ant: <git://git.apache.org/ant.git>
   - JEdit: https://sourceforge.net/p/jedit/svn/HEAD/tree/
-  - Maven: git://git.apache.org/maven.git
+  - Maven: <git://git.apache.org/maven.git>
 - Bug tracking systems:
-  - ArgoUML
-  - Ant
-  - JEdit
-  - Maven
+  - ArgoUML: http://argouml.tigris.org/project_bugs.html
+  - Ant: https://bz.apache.org/bugzilla/
+  - JEdit: https://sourceforge.net/p/jedit/bugs/
+  - Maven: https://issues.apache.org/jira/browse/MNG
 
 ###For any questions###
 Please send email to le.an@polymtl.ca
