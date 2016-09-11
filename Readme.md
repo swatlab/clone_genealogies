@@ -31,7 +31,7 @@
 7. Run **commit_bug_mapping.py** and **fault_inducing.py** to identify bug-inducing commits.
 8. Run **analyse_genealogies.py** to perform Fisher's exact test for RQ1 and RQ2.
 9. Run **independant_variables.py** to extract explanatory variables for RQ3.
-10. Build __GLM__ models with the R script in the **statistics/modelling** folder.
+10. Build __GLM__ models with the R script in the **statistics/modelling** folder for RQ3.
 
 ###Data source
 - Source code repositories:
