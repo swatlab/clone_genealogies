@@ -36,9 +36,9 @@
 ###Data source
 - Source code repositories:
   - ArgoUML: http://argouml-stats.stage.tigris.org/documentation/defaulthtml/cookbook/ch02s05.html
-  - Ant: <git://git.apache.org/ant.git>
+  - Ant: https://github.com/apache/ant
   - JEdit: https://sourceforge.net/p/jedit/svn/HEAD/tree/
-  - Maven: <git://git.apache.org/maven.git>
+  - Maven: https://github.com/apache/maven
 - Bug tracking systems:
   - ArgoUML: http://argouml.tigris.org/project_bugs.html
   - Ant: https://bz.apache.org/bugzilla/
