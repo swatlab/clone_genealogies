@@ -42,12 +42,27 @@ def clonePairs(clone_dict):
 
 # Extract changed file paths and their changed ranges
 def extractChangedFiles(commit_id):
+    modified_files, deleted_files = set(), set()
+    renaming_dict = dict()
     # extract changed files
-    changed_file_dict = dict()
-    raw_str = shellCommand('git log %s -n 1 --name-status' %commit_id)
-    modified_files = re.findall(r'M{1,2}\t(.+?\.java)', raw_str, re.MULTILINE)
-    deleted_files = re.findall(r'D\t(.+?\.java)', raw_str, re.MULTILINE)
-    return modified_files, deleted_files
+    raw_str = shellCommand('git log %s -n 1 --name-status -M' %commit_id)
+    for line in raw_str.split('\n'):
+        if line.endswith('.java'):
+            # in case of renaming
+            if line.startswith('R100') or line.startswith('R099'):
+                similarity = line.split('\t')[0]
+                old_path = line.split('\t')[1]
+                new_path = line.split('\t')[2]
+                if old_path.endswith('.java'):
+                    # add to a dict
+                    renaming_dict[old_path] = new_path
+                if similarity == 'R099':
+                    modified_files.add(new_path)
+            elif line.startswith('M'):
+                modified_files.add(line.split('\t')[1])
+            elif line.startswith('D'):
+                deleted_files.add(line.split('\t')[1])
+    return modified_files, deleted_files, renaming_dict
 
 # map line number from old commit to new commit
 def mapLineNumber(line_mapping, old_start, old_end):
@@ -69,7 +84,7 @@ def mapLineNumber(line_mapping, old_start, old_end):
                 begin_to_count = True
                 new_end = (new_line - old_line) + old_end 
         else:
-            if old_line == old_start:
+            if old_line >= old_start:
                 begin_to_count = True
             # if last line deleted in the clone boundary
             if begin_to_count:
@@ -82,7 +97,7 @@ def mapLineNumber(line_mapping, old_start, old_end):
 def expectedRange(start_line, end_line, diff_str, file_path):
     in_diff = False
     for diff in whatthepatch.parse_patch(diff_str):
-        diff_path = diff[0].old_path
+        diff_path = diff[0].new_path
         if diff_path == file_path:
             in_diff = True
             line_mapping = diff[1]        
@@ -113,7 +128,7 @@ def matchClone(clone_pair_dict, commit_id, path1, start1, end1, path2, start2, e
             if (path1 == s1_path) and (path2 == s2_path):
                 if (start1 >= s1_start) and (end1 <= s1_end):
                     if (start2 >= s2_start) and (end2 <= s2_end):
-                        clone_pair[2] = 1
+                        clone_pair[2] = 1   # marked as this clone pair has been analysed
                         return True
     return False
 
@@ -121,7 +136,7 @@ def matchClone(clone_pair_dict, commit_id, path1, start1, end1, path2, start2, e
 def clone_genealogy(clone_pair, start_commit, clone_pair_dict, changed_file_dict, diff_dict):
     if clone_pair[2] == 0:
         genealogy_list = list()
-        clone_pair[-1] = 1          # marked as this clone snippet has been analysed
+        clone_pair[2] = 1           # marked as this clone pair has been analysed
         path1 = clone_pair[0][0]    # original path of the 1st snippet
         path2 = clone_pair[1][0]    # original path of the 2nd snippet
         start1 = clone_pair[0][1]   # original start line of the 1st snippet
@@ -133,11 +148,17 @@ def clone_genealogy(clone_pair, start_commit, clone_pair_dict, changed_file_dict
             if genealogy_started == False:
                 if commit_id == start_commit:
                     genealogy_started = True
-            else:                                
-                modified_files, deleted_files = changed_file_dict[commit_id]
+            else:                
+                modified_files, deleted_files, renaming_dict = changed_file_dict[commit_id]
                 # if one or two of the clone snippet (in a pair) is deleted, then stop track this pair
                 if (path1 in deleted_files) or (path2 in deleted_files):
-                    return (genealogy_list, start_commit, commit_id)
+                    if not ((path1 in renaming_dict) or (path2 in renaming_dict)):
+                        return (genealogy_list, start_commit, commit_id)
+                    else:
+                        if path1 in deleted_files and path1 in renaming_dict: # in case of path1 renamed
+                            path1 = renaming_dict[path1]
+                        if path2 in deleted_files and path2 in renaming_dict: # in case of path2 renamed
+                            path2 = renaming_dict[path2]                        
                 if (start1 >= end1) or (start2 >= end2):
                     return (genealogy_list, start_commit, commit_id)
                 # if one or two of the clone files (in a pair) is changed
@@ -149,19 +170,21 @@ def clone_genealogy(clone_pair, start_commit, clone_pair_dict, changed_file_dict
                         churn1, start1, end1 = cloneModification(commit_id, path1, start1, end1, diff_dict)
                     if path2 in modified_files:
                         churn2, start2, end2 = cloneModification(commit_id, path2, start2, end2, diff_dict)
-                    # if one or two of the clone files (in a pair) is modified (+/- in the clone boundaries)
+                    # if one or two of the clone snippets (in a pair) is modified (+/- in the clone boundaries)
                     if (churn1 > 0) or (churn2 > 0):
                         if matchClone(clone_pair_dict, commit_id, path1, start1, end1, path2, start2, end2):
                             state = 'C'
                         else:
                             state = 'I'
                         churn_cnt = churn1 +churn2
-                    # none of the clone files is modified
+                    # none of the clone snippets is modified
                     else:
                         state = 'na'
+                        matchClone(clone_pair_dict, commit_id, path1, start1, end1, path2, start2, end2)
                 # none of the clone files is changed
                 else:
                     state = 'na'
+                    matchClone(clone_pair_dict, commit_id, path1, start1, end1, path2, start2, end2)
                 if state != 'na':
                     genealogy_list.append('%s,%s,%s' %(state,commit_id,churn_cnt))
         return (genealogy_list, start_commit, commit_id)
@@ -181,7 +204,7 @@ if __name__ == '__main__':
     else:
         project = sys.argv[1]
         tool = sys.argv[2]
-        project_list = ['ant', 'argouml', 'jedit', 'maven']
+        project_list = ['ant', 'argouml', 'jedit', 'maven', 'celix']
         tool_list = ['nicad', 'iclones']
         with open('../output_data/%s/%s_genealogies.csv' %(tool,project), 'w') as output_file:
             output_writer = csv.writer(output_file)
@@ -208,8 +231,8 @@ if __name__ == '__main__':
                 diff_dict = dict()
                 changed_file_dict = dict()
                 for commit_id in clone_pair_dict:
-                    modified_files, deleted_files = extractChangedFiles(commit_id)
-                    changed_file_dict[commit_id] = (modified_files, deleted_files)
+                    modified_files, deleted_files, renaming_dict = extractChangedFiles(commit_id)
+                    changed_file_dict[commit_id] = (modified_files, deleted_files, renaming_dict)
                     # perform Git Diff command
                     diff_str = shellCommand('git diff %s^ %s' %(commit_id,commit_id))
                     diff_dict[commit_id] = unicode(diff_str, errors='replace')
@@ -244,9 +267,12 @@ if __name__ == '__main__':
                             genealogy_res = clone_genealogy(clone_pair, commit_id, clone_pair_dict, changed_file_dict, diff_dict)
                             if genealogy_res != 'old_pair':
                                 genealogy_set.add(clone_sig)
-                                print '\tGenealogy:', genealogy_res
+                                if DEBUG:
+				                    print '\tGenealogy:', genealogy_res
                                 genealogy_str = '-'.join(genealogy_res[0])
                                 start_commit, end_commit = genealogy_res[1], genealogy_res[2]
-                                output_writer.writerow([clone_sig, start_commit, end_commit, genealogy_str])
+                                if len(genealogy_str):
+                                    output_writer.writerow([clone_sig, start_commit, end_commit, genealogy_str])
                             else:
-                                print '  Old pair!'
+                                if DEBUG:
+				                    print '  Old pair!'

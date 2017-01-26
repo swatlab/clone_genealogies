@@ -81,9 +81,11 @@ def computeFisherExact(df, input_list, output_list):
             row_list.append(countOccurrences(df, in_var, out_var))
         table_list.append(row_list)
     print table_list
+    comparison_num = len(table_list)-1
     print '%10s%10s' %('odds_ratio', 'p-value')
     for i in range(1, len(table_list)):
-        oddsratio, pvalue = stats.fisher_exact([table_list[i], [table_list[0]])
+        oddsratio, pvalue = stats.fisher_exact([table_list[i], table_list[0]])
+        pvalue *= comparison_num # Adjusted p-value: the p-values are multiplied by the number of comparisons 
         if pvalue < 0.01:
             print '%10.2f%10s' %(round(oddsratio,2), '<0.01')
         else:
@@ -151,7 +153,7 @@ def statistics(gen_stat_list, change_state_list, gen_change_list, interval_list)
     return
 
 if __name__ == '__main__':
-    tool = 'nicad'
-    project = 'argouml'
+    tool = 'iclones'
+    project = 'maven'
     gen_stat_list, change_state_list, gen_change_list, interval_list = loadGenealogies(project, tool)
     statistics(gen_stat_list, change_state_list, gen_change_list, interval_list)

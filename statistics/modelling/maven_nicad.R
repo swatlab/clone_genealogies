@@ -54,7 +54,7 @@ formula = as.formula(paste('buggy ~ ', paste(xcol, collapse= '+')))
 fit3 = glm(formula, data = df.log, family = binomial())
 # VIF analysis
 alias(fit3)
-formula = update(formula, ~. -EEvPattern -EConStChg -EFltsConStChg -EFltIncStChg)
+formula = update(formula, ~. -EEvPattern)
 fit3 = glm(formula, data = df.log, family = binomial())
 alias(fit3)
 vif(fit3)
