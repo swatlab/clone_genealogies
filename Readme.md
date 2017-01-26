@@ -29,7 +29,7 @@
 4. Run **detect_clones.py** and **extract_clone_results.py** to detect clone classes for a subject system using a clone detection tool.
 6. Run **build_genealogies.py** to extract clone pairs from the JSON file, then build clone genealogies for each clone pair.
 7. Run **commit_bug_mapping.py** and **fault_inducing.py** to identify bug-inducing commits.
-8. Run **analyse_genealogies.py** to perform Fisher's exact test for RQ1 and RQ2.
+8. Run **statistics.py** to perform Fisher's exact test for RQ1 and RQ2.
 9. Run **independant_variables.py** to extract explanatory variables for RQ3.
 10. Build __GLM__ models with the R script in the **statistics/modelling** folder for RQ3.
 
