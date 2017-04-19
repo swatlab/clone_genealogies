@@ -1,12 +1,12 @@
-#An Investigation of the Fault-proneness of Clone Evolutionary Patterns
+# An Investigation of the Fault-proneness of Clone Evolutionary Patterns
 
-###Requirements
+### Requirements
 - Python 2.7 or newer
 - R 3.1 or newer
 - NiCad clone detection tool
 - iClones clone detection tool
 
-###File description
+### File description
 - **analytic_scripts** folder contains the scripts to mine software repositories.
 	- **detect_clones.py**: detect clone classes from each of the commits from a Git repository. This script will output raw clone results of a subject system.
 	- **extract_clone_results.py**: extract clone classes into a JSON file from the raw clone results.
@@ -20,7 +20,7 @@
 - **raw_data** folder contains the commit logs and commit sequence for each subject system extracted from its Git repository.
 - **output_data.zip** is a compressed folder that contains the results of clone classes, clone genealogies, and bug-inducing commits.
 
-###How to user the analytic scripts
+### How to user the analytic scripts
 1. Clone a project's Git repository. For systems originally managed by SVN, please follow this tutorial to clone the repository as Git:
    https://www.atlassian.com/git/tutorials/migrating-convert/.
 2. Use the following command to extract the project's commit logs:
@@ -33,7 +33,7 @@
 9. Run **independant_variables.py** to extract explanatory variables for RQ3.
 10. Build __GLM__ models with the R script in the **statistics/modelling** folder for RQ3.
 
-###Data source
+### Data source
 - Source code repositories:
   - ArgoUML: http://argouml-stats.stage.tigris.org/documentation/defaulthtml/cookbook/ch02s05.html
   - Ant: https://github.com/apache/ant
@@ -45,5 +45,5 @@
   - JEdit: https://sourceforge.net/p/jedit/bugs/
   - Maven: https://issues.apache.org/jira/browse/MNG
 
-###For any questions###
+### For any questions
 Please send email to le.an@polymtl.ca
